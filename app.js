@@ -7,12 +7,26 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const passport = require("passport");
 var authRouter = require("./routes/auth");
 var indexRouter = require("./routes/index");
 
 var app = express();
 
 app.locals.pluralize = require("pluralize");
+
+var session = require("express-session");
+
+var SQLiteStore = require("connect-sqlite3")(session);
+app.use(
+  session({
+    secret: "keyboard cat",
+    resave: false,
+    saveUninitialized: false,
+    store: new SQLiteStore({ db: "sessions.db", dir: "./var/db" }),
+  })
+);
+app.use(passport.authenticate("session"));
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
